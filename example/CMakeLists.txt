@@ -15,6 +15,7 @@ add_CGAL_example(VectorConvexHull2)
 
 if(CGAL_Qt5_FOUND)
     add_CGAL_Qt5_example(DrawSurfaceMesh)
+    add_CGAL_Qt5_example(DrawTriangulation3)
 else()
     message("CGAL Qt5 not found")
 endif()
