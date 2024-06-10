@@ -30,7 +30,7 @@ int main()
     std::cout << "make a right turn\n";
     break;
   }
-  
-  std::cout << " midpoint(p,q) = " << CGAL::midpoint(p,q) << std::endl;
+
+  std::cout << "midpoint(p,q) = " << CGAL::midpoint(p,q) << std::endl;
   return 0;
 }
