@@ -5,4 +5,4 @@ set(CMAKE_CXX_STANDARD 20)
 
 find_package(CGAL REQUIRED COMPONENTS Core)
 
-add_subdirectory(test)
+add_subdirectory(example)
