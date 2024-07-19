@@ -10,6 +10,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Core CGAL and Qt5 CGAL extension required
 find_package(CGAL REQUIRED COMPONENTS Core)
-find_package(CGAL REQUIRED OPTIONAL_COMPONENTS Qt5)
+
+set(VORONOI_3D_INCLUDE_DIRECTORY
+  ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_subdirectory(example)
