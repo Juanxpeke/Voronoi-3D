@@ -6,6 +6,8 @@
 #include <fstream>
 #include <cassert>
 
+#include "OFFConstructor.h"
+
 typedef CGAL::Linear_cell_complex_for_combinatorial_map<3> LCC_3;
 typedef LCC_3::Dart_descriptor Dart_descriptor;
 typedef LCC_3::Point           Point;
@@ -65,6 +67,16 @@ namespace V3D
 
       std::cout << "Voronoi LCC:" << std::endl << "  ";
       voronoiLCC.display_characteristics(std::cout) << ", valid=" << voronoiLCC.is_valid() << std::endl;
+    }
+
+    void writeTriangulationToOFF(const std::string& path)
+    {
+      writeLCCToOFF(path, triangulationLCC);
+    }
+
+    void writeVoronoiToOFF(const std::string& path)
+    {
+      writeLCCToOFF(path, voronoiLCC);
     }
 
   private:
@@ -131,6 +143,86 @@ namespace V3D
       }
 
       assert(voronoiLCC.is_without_boundary(1) && voronoiLCC.is_without_boundary(2));
+    }
+
+    void writeLCCToOFF(const std::string& path, const LCC_3& lcc)
+    {
+      V3D::OFFConstructor off;
+      
+      LCC_3::size_type markVolumes  = lcc.get_new_mark();
+      LCC_3::size_type markFaces    = lcc.get_new_mark();
+      LCC_3::size_type orientedMark = lcc.get_new_mark();
+
+      lcc.orient(orientedMark);
+
+      for (LCC_3::Dart_range::const_iterator it = lcc.darts().begin(), itend = lcc.darts().end(); it != itend; ++it)
+      {
+        if (!lcc.is_marked(it, markVolumes))
+        {
+          for (LCC_3::template Dart_of_cell_basic_range<3>::const_iterator
+               itv = lcc.template darts_of_cell_basic<3>(it, markVolumes).begin(), itvend = lcc.template darts_of_cell_basic<3>(it, markVolumes).end();
+               itv != itvend;
+               ++itv)
+          {
+            lcc.mark(itv, markVolumes); // To be sure that all darts of the basic iterator will be marked
+
+            if (!lcc.is_marked(itv, markFaces) && lcc.is_marked(itv, orientedMark))
+            {
+              writeLCCFace(off, lcc, itv);
+            }
+
+            for (LCC_3::template Dart_of_cell_basic_range<2>::const_iterator
+                 itf = lcc.template darts_of_cell_basic<2>(itv, markFaces).begin(), itfend = lcc.template darts_of_cell_basic<2>(itv, markFaces).end();
+                 itf != itfend;
+                 ++itf)
+            {
+              lcc.mark(itf, markFaces); // To be sure that all darts of the basic iterator will be marked
+            }
+          }
+        }
+      }
+      
+      for (LCC_3::Dart_range::const_iterator it = lcc.darts().begin(), itend = lcc.darts().end(); it != itend; ++it)
+      {
+        lcc.unmark(it, markFaces);
+        lcc.unmark(it, markVolumes);
+        lcc.unmark(it, orientedMark);
+      }
+
+      lcc.free_mark(markVolumes);
+      lcc.free_mark(markFaces);
+      lcc.free_mark(orientedMark);
+
+      off.write(path);
+    }
+
+    void writeLCCFace(OFFConstructor& off, const LCC_3& lcc, LCC_3::Dart_const_descriptor dh)
+    {
+      LCC_3::Dart_const_descriptor cur = dh;
+      LCC_3::Dart_const_descriptor min = dh;
+
+      do
+      {
+        if (!lcc.is_next_exist(cur)) return; // Open face
+        if (cur < min) min = cur;
+        cur = lcc.next(cur);
+      }
+      while(cur != dh);
+
+      off.initFace();
+
+      cur = dh;
+      do
+      {
+        Point p = lcc.point(cur);
+
+        off.addVertex(p.x(), p.y(), p.z());
+
+        cur = lcc.next(cur);
+      }
+      while(cur != dh);
+
+      off.endFace();
     }
 
     // Delaunay Triangulation 3

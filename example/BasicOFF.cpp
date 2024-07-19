@@ -5,18 +5,18 @@ int main()
 {
     V3D::OFFConstructor off;
 
-    off.init_face();
-    off.add_vertex(0.0, 0.0, 0.0);
-    off.add_vertex(1.0, 0.0, 0.0);
-    off.add_vertex(0.0, 1.0, 0.0);
-    off.end_face();
+    off.initFace();
+    off.addVertex(0.0, 0.0, 0.0);
+    off.addVertex(1.0, 0.0, 0.0);
+    off.addVertex(0.0, 1.0, 0.0);
+    off.endFace();
 
-    off.init_face();
-    off.add_vertex(0.0, 0.0, 0.0);
-    off.add_vertex(0.0, 1.0, 0.0);
-    off.add_vertex(0.0, 1.0, 1.0);
-    off.add_vertex(0.0, 0.0, 1.0);
-    off.end_face();
+    off.initFace();
+    off.addVertex(0.0, 0.0, 0.0);
+    off.addVertex(0.0, 1.0, 0.0);
+    off.addVertex(0.0, 1.0, 1.0);
+    off.addVertex(0.0, 0.0, 1.0);
+    off.endFace();
 
     const std::string outputPath = V3D::filePath("assets/output/BasicOFF.off");
 
