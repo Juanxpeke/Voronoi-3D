@@ -23,6 +23,7 @@ add_example(BasicOFF)
 add_example(BasicDelaunayVoronoi)
 add_example(BasicDelaunayToOFF)
 add_example(BasicVoronoiToOFF)
+add_example(Complex)
 
 # CGAL Examples
 
