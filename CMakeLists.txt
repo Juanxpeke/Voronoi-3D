@@ -11,7 +11,15 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # Core CGAL and Qt5 CGAL extension required
 find_package(CGAL REQUIRED COMPONENTS Core)
 
+set(THIRD_PARTY_INCLUDE_DIRECTORIES 
+  ${CMAKE_CURRENT_SOURCE_DIR}/third_party/glad/include
+	${CMAKE_CURRENT_SOURCE_DIR}/third_party/glfw/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/third_party/glm)
+
+set(THIRD_PARTY_LIBRARIES glfw glad)
+
 set(VORONOI_3D_INCLUDE_DIRECTORY
   ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+add_subdirectory(third_party)
 add_subdirectory(example)

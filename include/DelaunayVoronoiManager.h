@@ -37,7 +37,7 @@ namespace V3D
     {
       triangulationDart = CGAL::import_from_triangulation_3<LCC_3, Triangulation>(triangulationLCC, delaunayTriangulation, &triangulationVolToDart);
       
-      std::cout << "Triangulation LCC:" << std::endl << "  ";
+      std::cout << "[DelaunayVoronoiManager] Triangulation LCC:" << std::endl << "  ";
       triangulationLCC.display_characteristics(std::cout) << ", valid=" << triangulationLCC.is_valid() << std::endl;
     }
 
@@ -51,12 +51,12 @@ namespace V3D
       transformDartToDual();
       setVoronoiLCCGeometry();
 
-      std::cout << "Unfiltered Voronoi LCC:" << std::endl << "  ";
+      std::cout << "[DelaunayVoronoiManager] Unfiltered Voronoi LCC:" << std::endl << "  ";
       voronoiLCC.display_characteristics(std::cout) << ", valid=" << voronoiLCC.is_valid() << std::endl;
 
       filterVoronoiLCCFiniteVolumes();
 
-      std::cout << "Voronoi LCC:" << std::endl << "  ";
+      std::cout << "[DelaunayVoronoiManager] Voronoi LCC:" << std::endl << "  ";
       voronoiLCC.display_characteristics(std::cout) << ", valid=" << voronoiLCC.is_valid() << std::endl;
     }
 
@@ -79,7 +79,7 @@ namespace V3D
 
       std::map<LCC_3::Dart_descriptor, LCC_3::Dart_descriptor> dual;
 
-      for (; it1!=triangulationLCC.darts().end(); ++it1, ++it2)
+      for (; it1 != triangulationLCC.darts().end(); ++it1, ++it2)
       {
         dual[it1] = it2;
       }
@@ -146,20 +146,26 @@ namespace V3D
 
       lcc.orient(orientedMark);
 
+      size_t volumeCount = 0;
+      size_t faceCount = 0;
+
       for (LCC_3::Dart_range::const_iterator it = lcc.darts().begin(), itend = lcc.darts().end(); it != itend; ++it)
       {
         if (!lcc.is_marked(it, markVolumes))
         {
+          volumeCount++;
+          
           for (LCC_3::template Dart_of_cell_basic_range<3>::const_iterator
                itv = lcc.template darts_of_cell_basic<3>(it, markVolumes).begin(), itvend = lcc.template darts_of_cell_basic<3>(it, markVolumes).end();
                itv != itvend;
                ++itv)
           {
+
             lcc.mark(itv, markVolumes); // To be sure that all darts of the basic iterator will be marked
 
             if (!lcc.is_marked(itv, markFaces) && lcc.is_marked(itv, orientedMark))
             {
-              writeLCCFace(off, lcc, itv);
+              writeLCCFace(off, lcc, itv, faceCount);
             }
 
             for (LCC_3::template Dart_of_cell_basic_range<2>::const_iterator
@@ -167,12 +173,16 @@ namespace V3D
                  itf != itfend;
                  ++itf)
             {
+
               lcc.mark(itf, markFaces); // To be sure that all darts of the basic iterator will be marked
             }
           }
         }
       }
       
+      std::cout << "[DelaunayVoronoiManager] Volume count " << volumeCount << std::endl;
+      std::cout << "[DelaunayVoronoiManager] Face count " << faceCount << std::endl;
+
       for (LCC_3::Dart_range::const_iterator it = lcc.darts().begin(), itend = lcc.darts().end(); it != itend; ++it)
       {
         lcc.unmark(it, markFaces);
@@ -187,7 +197,7 @@ namespace V3D
       off.write(path);
     }
 
-    void writeLCCFace(OFFConstructor& off, const LCC_3& lcc, LCC_3::Dart_const_descriptor dh)
+    void writeLCCFace(OFFConstructor& off, const LCC_3& lcc, LCC_3::Dart_const_descriptor dh, size_t& faceCount)
     {
       LCC_3::Dart_const_descriptor cur = dh;
       LCC_3::Dart_const_descriptor min = dh;
@@ -214,6 +224,8 @@ namespace V3D
       while(cur != dh);
 
       off.endFace();
+      
+      faceCount++;
     }
 
     // Delaunay Triangulation 3
