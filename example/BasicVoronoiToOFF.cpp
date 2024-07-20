@@ -3,6 +3,7 @@
 
 int main()
 {
+  const std::string triangulationPath = V3D::filePath("assets/output/Triangulation.off");
   const std::string voronoiPath = V3D::filePath("assets/output/Voronoi.off");
 
   V3D::DelaunayVoronoiManager dvm;
@@ -22,6 +23,7 @@ int main()
   dvm.generateTriangulationLCC();
   dvm.generateVoronoiLCC();
 
+  dvm.writeTriangulationToOFF(triangulationPath);
   dvm.writeVoronoiToOFF(voronoiPath);
 
   return 0;
