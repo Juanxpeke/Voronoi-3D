@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Definitions.h"
 
 namespace V3D

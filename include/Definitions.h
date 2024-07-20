@@ -1,3 +1,5 @@
+#pragma once
+
 #include <CGAL/Linear_cell_complex_for_combinatorial_map.h>
 #include <CGAL/Delaunay_triangulation_3.h>
 #include <CGAL/Triangulation_3_to_lcc.h>
