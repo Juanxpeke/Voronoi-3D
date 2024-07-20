@@ -1,5 +1,8 @@
 # Builds
 /build
 
+# Third party
+**/third_party/**
+
 # Visual Studio Code
 .vscode
