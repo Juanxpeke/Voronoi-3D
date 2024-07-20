@@ -6,6 +6,7 @@
 
 #include "Definitions.h"
 #include "OFFConstructor.h"
+#include "Volume.h"
 
 namespace V3D
 {
@@ -138,9 +139,10 @@ namespace V3D
       assert(voronoiLCC.is_without_boundary(1) && voronoiLCC.is_without_boundary(2));
     }
 
-    void writeLCCToOFF(const std::string& path, const LCC_3& lcc)
+    std::vector<Volume> writeLCCToOFF(const std::string& path, const LCC_3& lcc)
     {
-      V3D::OFFConstructor off;
+      OFFConstructor off;
+      std::vector<Volume> volumes;
       
       LCC_3::size_type markVolumes  = lcc.get_new_mark();
       LCC_3::size_type markFaces    = lcc.get_new_mark();
@@ -148,15 +150,12 @@ namespace V3D
 
       lcc.orient(orientedMark);
 
-      size_t volumeCount = 0;
-      size_t faceCount = 0;
-
       for (LCC_3::Dart_range::const_iterator it = lcc.darts().begin(), itend = lcc.darts().end(); it != itend; ++it)
       {
         if (!lcc.is_marked(it, markVolumes))
         {
-          volumeCount++;
-          
+          Volume volume;
+
           for (LCC_3::template Dart_of_cell_basic_range<3>::const_iterator
                itv = lcc.template darts_of_cell_basic<3>(it, markVolumes).begin(), itvend = lcc.template darts_of_cell_basic<3>(it, markVolumes).end();
                itv != itvend;
@@ -167,7 +166,7 @@ namespace V3D
 
             if (!lcc.is_marked(itv, markFaces) && lcc.is_marked(itv, orientedMark))
             {
-              writeLCCFace(off, lcc, itv, faceCount);
+              writeLCCFace(off, volume, lcc, itv);
             }
 
             for (LCC_3::template Dart_of_cell_basic_range<2>::const_iterator
@@ -179,11 +178,10 @@ namespace V3D
               lcc.mark(itf, markFaces); // To be sure that all darts of the basic iterator will be marked
             }
           }
+
+          volumes.push_back(volume);
         }
       }
-      
-      std::cout << "[DelaunayVoronoiManager] Volume count " << volumeCount << std::endl;
-      std::cout << "[DelaunayVoronoiManager] Face count " << faceCount << std::endl;
 
       for (LCC_3::Dart_range::const_iterator it = lcc.darts().begin(), itend = lcc.darts().end(); it != itend; ++it)
       {
@@ -197,9 +195,11 @@ namespace V3D
       lcc.free_mark(orientedMark);
 
       off.write(path);
+
+      return volumes;
     }
 
-    void writeLCCFace(OFFConstructor& off, const LCC_3& lcc, LCC_3::Dart_const_descriptor dh, size_t& faceCount)
+    void writeLCCFace(OFFConstructor& off, Volume& volume, const LCC_3& lcc, LCC_3::Dart_const_descriptor dh)
     {
       LCC_3::Dart_const_descriptor cur = dh;
       LCC_3::Dart_const_descriptor min = dh;
@@ -213,6 +213,7 @@ namespace V3D
       while(cur != dh);
 
       off.initFace();
+      volume.initFace();
 
       cur = dh;
       do
@@ -220,14 +221,14 @@ namespace V3D
         Point p = lcc.point(cur);
 
         off.addVertex(p.x(), p.y(), p.z());
+        volume.addVertex(p.x(), p.y(), p.z());
 
         cur = lcc.next(cur);
       }
       while(cur != dh);
 
       off.endFace();
-      
-      faceCount++;
+      volume.endFace();
     }
 
     // Delaunay Triangulation 3

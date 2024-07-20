@@ -1,35 +1,58 @@
 #pragma once
 
 #include "Definitions.h"
+#include <glm/glm.hpp>
 
 namespace V3D
 {
 
+  struct Face
+  {
+    void addVertex(double x, double y, double z)
+    {
+      vertices.emplace_back(x, y, z);
+    }
+
+    std::vector<glm::vec3> vertices;
+  };
+
   class Volume
   {
   public:
+
+    Volume() : faceEnded(true) {}
+
     void initFace()
     {
-      currentFace.clear();
+      Face newFace;
+      faces.push_back(newFace);
+
+      faceEnded = false;
     }
 
     void addVertex(double x, double y, double z)
     {
-      vertices.push_back({x, y, z});
-      currentFace.push_back(vertices.size() - 1);
+      if (faceEnded) 
+      {
+        std::cout << "[Volume] Tried to add vertex to non initialized face!" << std::endl;
+      }
+
+      faces.back().addVertex(x, y, z);
     }
 
-    void endFace() {
-      if (!currentFace.empty())
-      {
-        faces.push_back(currentFace);
-      }
+    void endFace()
+    {
+      faceEnded = true;
+    }
+
+    std::vector<Face> getFaces()
+    {
+      return faces;
     }
 
   private:
-    std::vector<std::vector<double>> vertices;
-    std::vector<std::vector<int>> faces;
-    std::vector<int> currentFace;
+    std::vector<Face> faces;
+    bool faceEnded;
   };
 
 }

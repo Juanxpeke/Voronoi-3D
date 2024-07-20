@@ -25,7 +25,8 @@ namespace V3D
       currentFace.push_back(vertices.size() - 1);
     }
 
-    void endFace() {
+    void endFace()
+    {
       if (!currentFace.empty())
       {
         faces.push_back(currentFace);
