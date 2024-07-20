@@ -4,8 +4,8 @@ function(add_example TARGET_NAME)
 	set_property(TARGET ${TARGET_NAME} PROPERTY CXX_STANDARD 20)
 	set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER Examples)
 
-    target_include_directories(${TARGET_NAME} PRIVATE ${VORONOI_3D_INCLUDE_DIRECTORY})
-    target_link_libraries(${TARGET_NAME} CGAL::CGAL CGAL::CGAL_Core CGAL::Data)
+    target_include_directories(${TARGET_NAME} PRIVATE ${VORONOI_3D_INCLUDE_DIRECTORY} ${THIRD_PARTY_INCLUDE_DIRECTORIES})
+    target_link_libraries(${TARGET_NAME} CGAL::CGAL CGAL::CGAL_Core CGAL::Data ${THIRD_PARTY_LIBRARIES})
 endfunction(add_example)
 
 function(add_CGAL_example FOLDER_NAME TARGET_NAME)

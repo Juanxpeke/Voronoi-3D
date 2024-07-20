@@ -34,16 +34,28 @@ namespace V3D
       glBindVertexArray(0);
       glBindBuffer(GL_ARRAY_BUFFER, 0);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+      color = { 1.0, 1.0, 1.0 };
     }
 
-    void bind()
+    void bind() const
     {
       glBindVertexArray(VAO);
     }
 
-    void unbind()
+    void unbind() const
     {
       glBindVertexArray(0);
+    }
+
+    unsigned int getIndicesCount() const
+    {
+      return indicesSize;
+    }
+
+    glm::vec3 getColor() const
+    {
+      return color;
     }
 
     void fillFromVolume(Volume volume)
@@ -94,6 +106,8 @@ namespace V3D
     unsigned int EBO;
 
     unsigned int indicesSize;
+
+    glm::vec3 color;
   };
 
 }

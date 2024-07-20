@@ -50,6 +50,16 @@ namespace V3D
       return faces;
     }
 
+    void print()
+    {
+      std::cout << "Volume with faces:" << std::endl;
+
+      for (int i = 0; i < faces.size(); i++)
+      {
+        std::cout << "Face " << i << " with " << faces[i].vertices.size() << " vertices (vertex 0 = " << faces[i].vertices[0][0] << std::endl;
+      }
+    }
+
   private:
     std::vector<Face> faces;
     bool faceEnded;

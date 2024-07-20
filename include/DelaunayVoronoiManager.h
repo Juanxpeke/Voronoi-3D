@@ -63,14 +63,14 @@ namespace V3D
       voronoiLCC.display_characteristics(std::cout) << ", valid=" << voronoiLCC.is_valid() << std::endl;
     }
 
-    void writeTriangulationToOFF(const std::string& path)
+    std::vector<Volume> writeTriangulationToOFF(const std::string& path)
     {
-      writeLCCToOFF(path, triangulationLCC);
+      return writeLCCToOFF(path, triangulationLCC);
     }
 
-    void writeVoronoiToOFF(const std::string& path)
+    std::vector<Volume> writeVoronoiToOFF(const std::string& path)
     {
-      writeLCCToOFF(path, voronoiLCC);
+      return writeLCCToOFF(path, voronoiLCC);
     }
 
   private:
@@ -167,15 +167,15 @@ namespace V3D
             if (!lcc.is_marked(itv, markFaces) && lcc.is_marked(itv, orientedMark))
             {
               writeLCCFace(off, volume, lcc, itv);
-            }
 
-            for (LCC_3::template Dart_of_cell_basic_range<2>::const_iterator
-                 itf = lcc.template darts_of_cell_basic<2>(itv, markFaces).begin(), itfend = lcc.template darts_of_cell_basic<2>(itv, markFaces).end();
-                 itf != itfend;
-                 ++itf)
-            {
+              for (LCC_3::template Dart_of_cell_basic_range<2>::const_iterator
+                  itf = lcc.template darts_of_cell_basic<2>(itv, markFaces).begin(), itfend = lcc.template darts_of_cell_basic<2>(itv, markFaces).end();
+                  itf != itfend;
+                  ++itf)
+              {
 
-              lcc.mark(itf, markFaces); // To be sure that all darts of the basic iterator will be marked
+                lcc.mark(itf, markFaces); // To be sure that all darts of the basic iterator will be marked
+              }
             }
           }
 
@@ -216,12 +216,20 @@ namespace V3D
       volume.initFace();
 
       cur = dh;
+
+      Point lastP;
+
       do
       {
         Point p = lcc.point(cur);
 
-        off.addVertex(p.x(), p.y(), p.z());
-        volume.addVertex(p.x(), p.y(), p.z());
+        if (p != lastP)
+        {
+          off.addVertex(p.x(), p.y(), p.z());
+          volume.addVertex(p.x(), p.y(), p.z());
+          lastP = p;
+        }
+
 
         cur = lcc.next(cur);
       }
